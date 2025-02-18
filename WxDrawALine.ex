@@ -5,6 +5,13 @@
 # Usage "elixir WxDrawALine.ex"
 # More drawing methods at https://www.erlang.org/doc/man/wxdc
 
+# Elixsec Oy 2024
+# Public domain
+# No guarantees, no warranties, use at your own risk
+#
+# Usage "elixir WxDrawALine.ex"
+# More drawing methods at https://www.erlang.org/doc/man/wxdc
+
 
 defmodule WxDrawALine do
   def draw_a_line do
@@ -13,7 +20,8 @@ defmodule WxDrawALine do
     wx=:wx.new
 
     # Määritellään ja avataan ikkuna / Define and show window
-    frame=:wxFrame.new(wx,1,'Here I draw the line. 10 seconds')
+    frame=:wxFrame.new(wx,1,'Here I draw the line.')
+    :wxFrame.connect(frame,:close_window)
     :wxFrame.show(frame)
 
     # Avataan konteksti johon piirretään / Open device context to draw to
@@ -29,10 +37,18 @@ defmodule WxDrawALine do
     # Tuhotaan olio. Välttämätöntä, jotta jotain saadaan näkyviin. / Destroy the object. Necessary to make drawing visible.
     :wxWindowDC.destroy(windowDC)
 
-    :timer.sleep(10000)
+    loop()
 
+  end
+
+  def loop() do
+    receive do
+      {_,_,_,_,{_,:close_window}} ->
+        Process.exit(self(),:normal)
+      end
   end
 end
 
 # Käynnistys / Start
 WxDrawALine.draw_a_line
+
